@@ -2,13 +2,13 @@
 
 ---
 
-## a What is sharding in MongoDB?
+## a) What is sharding in MongoDB?
 
 **Sharding** in MongoDB is a method of **horizontal scaling** used to distribute large amounts of data across multiple servers (called shards). Each shard contains a subset of the data, which allows MongoDB to handle large data volumes and high-throughput operations more efficiently.
 
 ---
 
-## b What are the different components required to implement sharding?
+## b) What are the different components required to implement sharding?
 
 To implement sharding in MongoDB, the following components are required:
 
@@ -18,7 +18,7 @@ To implement sharding in MongoDB, the following components are required:
 
 ---
 
-## c Explain architecture of sharding in MongoDB
+## c) Explain architecture of sharding in MongoDB
 
 - **Clients** interact with the **`mongos` router**, not the shards directly.
 - **`mongos`** looks up the shard key in the **config servers** and routes the query to the correct shard.
@@ -28,11 +28,8 @@ To implement sharding in MongoDB, the following components are required:
 
 To find the **top 10 hashtags** used in the tweets, we can use the `mapReduce` function on the `tweets` collection.
 
-### 🧠 Goal:
-Extract hashtags from each tweet, count their occurrences, and store the result in a new collection called `hashtag_counts`.
-
-### 🗺️ Map Function:
-The map function emits each hashtag found in the tweet’s `entities.hashtags` array.
+###  Map Function:
+The map function emits each hashtag found in the tweets`entities.hashtags` array.
 
 
 ```javascript
@@ -65,6 +62,35 @@ db.tweets.mapReduce(
     out: "hashtag_counts"
   }
 );
+```
+
+## e) Provide execution command for running MapReduce
+
+This will create a new collection called hashtag_counts containing the hashtags and their usage counts.
+
+To retrieve the top 10 most used hashtags:
+```javascript
+db.hashtag_counts.find().sort({ value: -1 }).limit(10);
+```
+
+## f) Provide top 10 recorded out of the sorted result
+
+The following are the **top 10 hashtags** found using the MapReduce approach on the dataset:
+
+```json
+[
+  { "_id": "nodejs", "value": 29 },
+  { "_id": "angularjs", "value": 29 },
+  { "_id": "fcblive", "value": 27 },
+  { "_id": "javascript", "value": 22 },
+  { "_id": "globalmoms", "value": 19 },
+  { "_id": "lfc", "value": 19 },
+  { "_id": "espanyolfcb", "value": 18 },
+  { "_id": "webinar", "value": 18 },
+  { "_id": "iwci", "value": 17 },
+  { "_id": "job", "value": 13 }
+]
+
 ```
 
 
