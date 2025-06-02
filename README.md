@@ -93,6 +93,13 @@ The following are the **top 10 hashtags** found using the MapReduce approach on 
 
 ```
 
+- The ´my-next-app´ is a simple next.js app. The app supports functionality for getting the 10 first tweets and a form to submit new tweets. 
+- The "mongodb-shard" is the local configuration setup. 
+- **Shards**: We created two replica sets: `shard1ReplSet` and `shard2ReplSet`. Each consists of three `mongod` instances (on ports 27001–27003 and 27101–27103 respectively).
+- **Config Server**: A replica set of three config server instances was used (on ports 26001–26003).
+- **Mongos Router**: A single `mongos` instance (on port 27017) served as the router and entry point to the sharded cluster.
+- **Dataset**: A Twitter dataset (in `.bson` format) was imported into the cluster.
+- **Sharding Key**: We used `"user.id"` as the shard key, and manually split the data at the midpoint of the value range to distribute the tweets across both shards.
 
 
 
