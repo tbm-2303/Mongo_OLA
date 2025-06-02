@@ -1,105 +1,71 @@
-# Mongo_OLA
-
-## MongoDB Setup (Standalone)
-
-This section describes the steps used to install and run a standalone MongoDB instance for development.
+#  MongoDB Sharding and Hashtag Analysis Assignment
 
 ---
 
-### Step 1: Install MongoDB Community Edition
+## a What is sharding in MongoDB?
 
-Download and install MongoDB from the official source:  
-[https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
-
-- Platform: **Windows**
-- Package: **MSI Installer**
-- Select the option to **install as a service**
+**Sharding** in MongoDB is a method of **horizontal scaling** used to distribute large amounts of data across multiple servers (called shards). Each shard contains a subset of the data, which allows MongoDB to handle large data volumes and high-throughput operations more efficiently.
 
 ---
 
-### Step 2: Create Data Directory
+## b What are the different components required to implement sharding?
 
-Create a folder for MongoDB to store its data:
+To implement sharding in MongoDB, the following components are required:
 
-```cmd
-mkdir C:\mongodb\data
-```
-
----
-
-### Step 3: Start MongoDB Daemon
-
-Start the MongoDB server:
-
-```cmd
-mongod --dbpath C:\mongodb\data
-```
-
-This starts the MongoDB daemon and listens on the default port `27017`.
+- **Shard**: A MongoDB server or replica set that stores part of the sharded data.
+- **Config Servers**: Store metadata and configuration settings for the entire sharded cluster.
+- **mongos Router**: Acts as a query router between the application and the shards.
 
 ---
 
+## c Explain architecture of sharding in MongoDB
 
-### Step 4: Install & Run MongoDB Shell (`mongosh`)
+- **Clients** interact with the **`mongos` router**, not the shards directly.
+- **`mongos`** looks up the shard key in the **config servers** and routes the query to the correct shard.
+- **Data** is split across shards using a **shard key**, which defines how documents are partitioned.
 
-If the shell is not installed, download it from:  
-https://www.mongodb.com/try/download/shell
+## d) Provide implementation of map and reduce function
 
-Once installed, open a **new terminal** and run:
+To find the **top 10 hashtags** used in the tweets, we can use the `mapReduce` function on the `tweets` collection.
 
-```cmd
-mongosh
+### 🧠 Goal:
+Extract hashtags from each tweet, count their occurrences, and store the result in a new collection called `hashtag_counts`.
+
+### 🗺️ Map Function:
+The map function emits each hashtag found in the tweet’s `entities.hashtags` array.
+
+
+```javascript
+var map = function () {
+  if (this.entities && this.entities.hashtags) {
+    this.entities.hashtags.forEach(function (tag) {
+      emit(tag.text.toLowerCase(), 1);
+    });
+  }
+};
 ```
 
-Then test the connection:
+Reduce Function:
+The reduce function sums up the counts of each hashtag.
 
-```cmd
-db.stats()
+```javascript
+var reduce = function (key, values) {
+  return Array.sum(values);
+};
 ```
 
----
+Output Collection:
+We output the results to a new collection named hashtag_counts.
 
-
-### Step 5: Download the Dataset
-
-1. Go to:  
-   https://github.com/ozlerhakan/mongodb-json-files
-
-2. Click **"Code" → "Download ZIP"**
-
-3. Extract to:
-
+```javascript
+db.tweets.mapReduce(
+  map,
+  reduce,
+  {
+    out: "hashtag_counts"
+  }
+);
 ```
-C:\mongodb-datasets\
-```
-
-You should now have:
-
-```
-C:\mongodb-datasets\datasets\twitter\tweets.json
-```
-
----
-
-### Step 6: Import Dataset into MongoDB
-
-Run in a regular terminal (not mongosh):
-
-```cmd
-mongoimport --db twitterDB --collection tweets --file C:\mongodb-datasets\datasets\twitter\tweets.json
-```
-
-> If `mongoimport` is not recognized, use the full path:
-
-```cmd
-"C:\Program Files\MongoDB\Tools\100\bin\mongoimport.exe" --db twitterDB --collection tweets --file C:\mongodb-datasets\datasets\twitter\tweets.json
-```
-
----
-The Twitter dataset is now loaded into `twitterDB.tweets`.
-
-
-
 
 
 
